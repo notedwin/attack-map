@@ -17,6 +17,18 @@
   },
   "homepage": "https://github.com/notedwin/attack-map#readme",
   "dependencies": {
-    "tail": "^2.0.4"
+    "d3": "^6.2.0",
+    "datamaps": "^0.5.9",
+    "tail": "^2.0.4",
+    "topojson": "^3.0.2",
+    "topojson-client": "^3.1.0",
+    "topojson-server": "^3.0.1",
+    "topojson-simplify": "^3.0.3",
+    "window": "^4.2.7"
+  },
+  "devDependencies": {
+    "curl": "^0.1.4",
+    "jquery": "^3.5.1",
+    "jsdom": "^16.4.0"
   }
 }

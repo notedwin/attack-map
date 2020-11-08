@@ -53,3 +53,15 @@ const server = http.createServer((req, res) => {
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
+
+
+var jsdom = require("jsdom").jsdom;
+
+var dom = jsdom(`<!DOCTYPE html> <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="node_modules/datamaps/dist/datamaps.world.min.js"></script> <div id="container" style="position: relative; width: 80%; max-height: 450px;"></div> <script>
+
+</script>`);
+
+var window = document.defaultView;
+var $ = require('jquery')(window)
