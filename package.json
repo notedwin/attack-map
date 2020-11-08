@@ -1,0 +1,22 @@
+{
+  "name": "attack-map",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notedwin/attack-map.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/notedwin/attack-map/issues"
+  },
+  "homepage": "https://github.com/notedwin/attack-map#readme",
+  "dependencies": {
+    "tail": "^2.0.4"
+  }
+}
