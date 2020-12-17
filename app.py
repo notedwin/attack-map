@@ -32,36 +32,27 @@ def index():
     return render_template('index.html', async_mode=socketio.async_mode)
 
 
-@socketio.on('my_event', namespace='/test')
+@socketio.on('my_event')
 def test_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
          {'data': message['data'], 'count': session['receive_count']})
 
 
-@socketio.on('my_broadcast_event', namespace='/test')
-def test_broadcast_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         broadcast=True)
 
-
-@socketio.on('connect', namespace='/test')
-def test_connect():
+@socketio.on('connect')
+def connect():
     global thread
     with thread_lock:
         if thread is None:
             thread = socketio.start_background_task(background_thread)
     emit('my_response', {'data': 'Connected', 'count': 0})
     
-    
 
-
-@socketio.on('disconnect', namespace='/test')
+@socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected', request.sid)
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True,host= '0.0.0.0')
