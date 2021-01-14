@@ -1,14 +1,20 @@
 import socket
 import json
 from ipdata import ipdata
-    
-#ipdata = ipdata.IPData('8d90c6670a1a382d168336e0414e6c1aa7b4ed374579437293d07f63')
+import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+#ipdata = ipdata.IPData(os.environ.get("IPDATA_KEY"))
 #a = ipdata.lookup(line.strip())
 #arr.append([line.strip(),a["latitude"],a["longitude"]])
 
 
-HOST = '0.0.0.0'  # Standard loopback interface address (localhost)
-PORT = 5000        # Port to listen on (non-privileged ports are > 1023)
+HOST = os.environ.get("HOST") # Standard loopback interface address (localhost)
+PORT = int(os.environ.get("PORT"))       # Port to listen on (non-privileged ports are > 1023)
+print(type(HOST),type(PORT))
+x = []
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
@@ -21,8 +27,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 y = json.dumps(data)
                 y = json.loads(y)
+                print(y["message"])
                 print(y)
             except:
+                print("fail")
                 print(data)
             if not data:
                 break
+print(x)
