@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber attack Map</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <!-- I recommend you host this file on your own, since this will change without warning -->
+    <script src="http://datamaps.github.io/scripts/datamaps.world.min.js?v=1"></script>
+    <div id="container" style="position: relative; width: 100%;"></div>
+</head>
+
+<body>
+
+
+    <script>
+        //basic map config with custom fills, mercator projection
+
+        
+        var map = new Datamap({
+            scope: 'world',
+            element: document.getElementById('container'),
+            projection: 'mercator',
+            responsive: true
+        })
+
+
+        var dest =  {
+                    latitude: 41.84,
+                    longitude: -87.64
+                }
+        map.arc([
+            {
+                origin: {
+                    latitude: 50.34,
+                    longitude: -203.34
+                },
+                destination: dest
+            }
+        ], { strokeWidth: 2 });
+
+
+        var arcs = layer.selectAll('path.datamaps-arc').data( data, JSON.stringify);
+        arc.enter().transition().duration(2000).ease(Math.sqrt);
+        //bubbles, custom popup on hover template
+        map.bubbles([
+            { ip: '49.88.112.71', latitude: 41.84, longitude: -87.64, radius: 5, fillKey: 'gt50' },
+
+        ], {
+            popupTemplate: function (geo, data) {
+                return "<div class='hoverinfo'> Random scrub: " + data.ip + "</div>";
+            }
+        });
+    </script>
+</body>
+
+</html>

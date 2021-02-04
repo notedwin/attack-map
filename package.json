@@ -18,7 +18,8 @@
   "homepage": "https://github.com/notedwin/attack-map#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "d3": "^6.2.0",
+    "cheerio": "^1.0.0-rc.5",
+    "d3": "^6.5.0",
     "datamaps": "^0.5.9",
     "express": "^4.17.1",
     "log4js": "^6.3.0",
