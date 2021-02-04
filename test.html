@@ -28,12 +28,6 @@
             longitude: -87.64
         }
 
-        var jsonStream = new EventSource('https://example.com/yourstreamingservice')
-        jsonStream.onmessage = function (e) {
-            var message = JSON.parse(e.data);
-            // handle message
-        };
-
         //basic map config with custom fills, mercator projection
         async function demo() {
             var map = new Datamap({
@@ -76,9 +70,7 @@
                 map.svg.selectAll('path.datamaps-arc').attr("opacity", 1);
                 map.svg.selectAll('path.datamaps-arc').transition().duration(5000).style("opacity", 0);
                 map.svg.selectAll('path.datamaps-arc').transition().delay(5000).remove();
-                //map.svg.selectAll('circle.datamaps-bubble').attr("opacity", 1);
-                //map.svg.selectAll('circle.datamaps-bubble').transition().duration//(1000).style("opacity", 0);
-                //map.svg.selectAll('circle.datamaps-bubble').transition().delay//(10000).remove();
+                
                 await sleep(6000);
             }
         }

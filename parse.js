@@ -1,16 +1,16 @@
 var net = require("net");
 var log4js = require("log4js");
-var d3 = require('d3');
-var topojson = require('topojson');
+var d3 = require("d3");
+var topojson = require("topojson");
 var Axios = require("axios");
-//var datamaps = require("datamaps");
-var express = require('express');
+//var Datamaps = require("datamaps");
+//var Canvas = require("canvas");
+var express = require("express");
 var app = express();
-var path = require('path');
-var request = require('request');
+var path = require("path");
+var request = require("request");
 var cheerio = require("cheerio");
-var fs = require('fs')
-
+var fs = require("fs");
 
 let logger = log4js.getLogger();
 logger.level = process.env.DEBUG_LEVEL || "info";
@@ -20,14 +20,18 @@ logger.level = process.env.DEBUG_LEVEL || "info";
 const port = 5001;
 const html_port = 3000;
 
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/index.html')
-  })
+app.get("/", function (req, res) {
+  var html = fs.readFileSync(__dirname + '/index.html', 'utf8');
+  var $ = cheerio.load(html);
+  var scriptNode = '<script>arcs.pop()</script>';
+  $('body').append(scriptNode);
+  res.send($.html());
+  console.log($.html())
+});
 
 app.listen(html_port, () => {
-  console.log(`Example app listening at http://localhost:${html_port}`)
-})
-
+  console.log(`Example app listening at http://localhost:${html_port}`);
+});
 
 const clients = {};
 const API_URL = "http://ip-api.com/json/";
@@ -116,7 +120,7 @@ server.on("connection", function (socket) {
   socket.on("data", async function (data) {
     //echo data
     var dat = await data2ip(data);
-
+    // send data to arcs
     console.log("Parsed : " + dat);
   });
 
