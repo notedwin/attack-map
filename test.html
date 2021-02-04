@@ -28,6 +28,12 @@
             longitude: -87.64
         }
 
+        var jsonStream = new EventSource('https://example.com/yourstreamingservice')
+        jsonStream.onmessage = function (e) {
+            var message = JSON.parse(e.data);
+            // handle message
+        };
+
         //basic map config with custom fills, mercator projection
         async function demo() {
             var map = new Datamap({
@@ -62,9 +68,9 @@
                 bubbles.push({ ip: '49.88.112.71', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
 
                 map.arc(arcs, { strokeWidth: 5 });
-                map.bubbles(bubbles,{
+                map.bubbles(bubbles, {
                     popupTemplate: function (geo, data) {
-                        return "<div class='hoverinfo'> scrub from " +"country" +": " + data.ip + "</div>";
+                        return "<div class='hoverinfo'> scrub from " + "country" + ": " + data.ip + "</div>";
                     }
                 });
                 map.svg.selectAll('path.datamaps-arc').attr("opacity", 1);
