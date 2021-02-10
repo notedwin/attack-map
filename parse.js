@@ -11,11 +11,13 @@ var path = require("path");
 var request = require("request");
 var cheerio = require("cheerio");
 var fs = require("fs");
+var https = require("https")
 
 let logger = log4js.getLogger();
 logger.level = process.env.DEBUG_LEVEL || "info";
 
 //TODO: add datamaps functionality
+//TODO: add https
 
 const port = 5001;
 const html_port = 3000;
@@ -26,7 +28,6 @@ app.get("/", function (req, res) {
   var scriptNode = '<script>arcs.pop()</script>';
   $('body').append(scriptNode);
   res.send($.html());
-  console.log($.html())
 });
 
 app.listen(html_port, () => {
@@ -102,10 +103,7 @@ server.on("close", function () {
 
 // emitted when new client connects
 server.on("connection", function (socket) {
-  //this property shows the number of characters currently buffered to be written. (Number of characters is approximately equal to the number of bytes to be written, but the buffer may contain strings, and the strings are lazily encoded, so the exact number of bytes is not known.)
-  //Users who experience large or growing bufferSize should attempt to "throttle" the data flows in their program with pause() and resume().
-
-  console.log("bruh");
+  console.log("connect to log server.");
 
   socket.setEncoding("utf8");
 
@@ -165,10 +163,7 @@ server.on("listening", function () {
 
 server.maxConnections = 10;
 
-//static port allocation
 server.listen(port);
-
-// for dyanmic port allocation
 
 var islistening = server.listening;
 
