@@ -7,15 +7,18 @@
     <title>Cyber attack Map</title>
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <link rel="stylesheet" href="style.css">
     <!-- I recommend you host this file on your own, since this will change without warning -->
     <script src="https://datamaps.github.io/scripts/datamaps.world.min.js?v=1"></script>
 </head>
 
 <body>
+    <h1>Attack Map</h1>
+    <a href="https://edwin.computer">Go to Edwin's Home page</a>
     <div id="container" style="position: relative; width: 100%;"></div>
-
     <script>
-        //basic map config with custom fills, mercator projection
+        //currently shows the locations based on when the server started
+        //shows actual data and not random data
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
@@ -27,24 +30,23 @@
             longitude: -87.64
         }
 
-        //var jsonStream = new EventSource('https://example.com///yourstreamingservice')
-        //jsonStream.onmessage = function (e) {
-        //    var message = JSON.parse(e.data);
-        //    // handle message
-        //};
-
-        //basic map config with custom fills, mercator projection
-        async function demo() {
-            var map = new Datamap({
+        var map = new Datamap({
                 scope: 'world',
                 element: document.getElementById('container'),
                 projection: 'mercator',
-                responsive: true
+                responsive: true,
+                fills: {
+                    defaultFill: "#CCC",
+                    gt50:"#FF0000"
+                }
             })
 
             var arcs = [];
             var bubbles = [];
 
+        //basic map config with custom fills, mercator projection
+        async function demo() {
+            
             // while still connected
             var i = 0;
             var loc = <%- JSON.stringify(loc) %>;
@@ -65,14 +67,14 @@
                     destination: dest
                 });
 
-                bubbles.push({ ip: ip, latitude: lat, longitude: long, radius: 5, fillKey: 'gt50' });
+                bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: long, radius: 5, fillKey: 'gt50' });
 
-                bubbles.push({ ip: 'localhost', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
+                bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
 
-                map.arc(arcs, { strokeWidth: 5 });
+                map.arc(arcs, { strokeWidth: 5, strokeColor: '#000000' });
                 map.bubbles(bubbles, {
                     popupTemplate: function (geo, data) {
-                        return "<div class='hoverinfo'> +" +data.ip +" from " + ": " + data.country_name + "</div>";
+                        return "<div class='hoverinfo'> user: " +data.user +" on port: "+ data.port +" from: " + data.ip + "</div>";
                     }
                 });
                 map.svg.selectAll('path.datamaps-arc').attr("opacity", 1);
@@ -81,7 +83,7 @@
                 //map.svg.selectAll('circle.datamaps-bubble').attr("opacity", 1);
                 //map.svg.selectAll('circle.datamaps-bubble').transition().duration//(1000).style("opacity", 0);
                 //map.svg.selectAll('circle.datamaps-bubble').transition().delay//(10000).remove();
-                await sleep(6000);
+                await sleep(5000);
                 i++;
             }
         }

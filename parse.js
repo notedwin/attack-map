@@ -24,6 +24,7 @@ const port = 5001;
 const html_port = 3000;
 var info_arr = new Array();
 
+app.use(express.static(__dirname + '/public'));
 
 app.get("/", function (req, res) {
   res.render("index", {loc: info_arr});
