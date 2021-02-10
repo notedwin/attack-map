@@ -27,11 +27,11 @@
             longitude: -87.64
         }
 
-        var jsonStream = new EventSource('https://example.com/yourstreamingservice')
-        jsonStream.onmessage = function (e) {
-            var message = JSON.parse(e.data);
-            // handle message
-        };
+        //var jsonStream = new EventSource('https://example.com///yourstreamingservice')
+        //jsonStream.onmessage = function (e) {
+        //    var message = JSON.parse(e.data);
+        //    // handle message
+        //};
 
         //basic map config with custom fills, mercator projection
         async function demo() {
@@ -46,30 +46,33 @@
             var bubbles = [];
 
             // while still connected
-            var i = 0
-            while (i < 100) {
-                arcs.pop()
-                bubbles.pop()
-                bubbles.pop()
-                i++;
-                var lat = Math.random() * 180 + -90;
-                var longi = Math.random() * 360 + -180;
+            var i = 0;
+            var loc = <%- JSON.stringify(loc) %>;
+            console.log(loc[0].lat);
+            console.log(loc[0]);
+
+            while (i < loc.length) {
+                arcs.pop();
+                bubbles.pop();
+                bubbles.pop();
+                var {user,ip,port,long,lat} = loc[i];
+                
                 arcs.push({
                     origin: {
                         latitude: lat,
-                        longitude: longi
+                        longitude: long
                     },
                     destination: dest
                 });
 
-                bubbles.push({ ip: '49.88.112.71', latitude: lat, longitude: longi, radius: 5, fillKey: 'gt50' });
+                bubbles.push({ ip: ip, latitude: lat, longitude: long, radius: 5, fillKey: 'gt50' });
 
-                bubbles.push({ ip: '49.88.112.71', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
+                bubbles.push({ ip: 'localhost', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
 
                 map.arc(arcs, { strokeWidth: 5 });
                 map.bubbles(bubbles, {
                     popupTemplate: function (geo, data) {
-                        return "<div class='hoverinfo'> scrub from " + "country" + ": " + data.ip + "</div>";
+                        return "<div class='hoverinfo'> +" +data.ip +" from " + ": " + data.country_name + "</div>";
                     }
                 });
                 map.svg.selectAll('path.datamaps-arc').attr("opacity", 1);
@@ -79,6 +82,7 @@
                 //map.svg.selectAll('circle.datamaps-bubble').transition().duration//(1000).style("opacity", 0);
                 //map.svg.selectAll('circle.datamaps-bubble').transition().delay//(10000).remove();
                 await sleep(6000);
+                i++;
             }
         }
 

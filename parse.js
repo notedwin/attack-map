@@ -15,19 +15,18 @@ var https = require("https")
 
 let logger = log4js.getLogger();
 logger.level = process.env.DEBUG_LEVEL || "info";
+app.set('view engine', 'ejs');
 
 //TODO: add datamaps functionality
 //TODO: add https
 
 const port = 5001;
 const html_port = 3000;
+var info_arr = new Array();
+
 
 app.get("/", function (req, res) {
-  var html = fs.readFileSync(__dirname + '/index.html', 'utf8');
-  var $ = cheerio.load(html);
-  var scriptNode = '<script>arcs.pop()</script>';
-  $('body').append(scriptNode);
-  res.send($.html());
+  res.render("index", {loc: info_arr});
 });
 
 app.listen(html_port, () => {
@@ -54,7 +53,16 @@ async function data2ip(data) {
   const ipLocation = await doApiCall(ip);
   const { lon, lat } = ipLocation;
 
-  return [user, ip, port, lon, lat];
+  var res = { };
+  res["user"] = user;
+  res["ip"] = ip;
+  res["port"] = port;
+  res["long"] = lon;
+  res["lat"] = lat;
+
+  info_arr.push(res);
+
+  return res;
 }
 
 async function retrieveLocationFromAPI(ip) {
@@ -108,18 +116,12 @@ server.on("connection", function (socket) {
   socket.setEncoding("utf8");
 
   socket.setTimeout(800000, function () {
-    // called after timeout -> same as socket.on('timeout')
-    // it just tells that soket timed out => its ur job to end or destroy the socket.
-    // socket.end() vs socket.destroy() => end allows us to send final data and allows some i/o activity to finish before destroying the socket
-    // whereas destroy kills the socket immediately irrespective of whether any i/o operation is goin on or not...force destry takes place
     console.log("Socket timed out");
   });
 
   socket.on("data", async function (data) {
-    //echo data
     var dat = await data2ip(data);
-    // send data to arcs
-    console.log("Parsed : " + dat);
+    console.log("Parsed : " + JSON.stringify(dat));
   });
 
   socket.on("error", function (error) {
@@ -129,7 +131,6 @@ server.on("connection", function (socket) {
   socket.on("timeout", function () {
     console.log("Socket timed out !");
     socket.end("Timed out!");
-    // can call socket.destroy() here too.
   });
 
   socket.on("end", function (data) {
@@ -151,12 +152,10 @@ server.on("connection", function (socket) {
   }, 1200000);
 });
 
-// emits when any error occurs -> calls closed event immediately after this.
 server.on("error", function (error) {
   console.log("Error: " + error);
 });
 
-//emits when server is bound with server.listen
 server.on("listening", function () {
   console.log("Server is listening!");
 });
