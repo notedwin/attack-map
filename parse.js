@@ -25,9 +25,14 @@ const html_port = 3000;
 var info_arr = new Array();
 
 app.use(express.static(__dirname + '/public'));
+app.set('views', path.join(__dirname, '/views'));
 
-app.get("/", function (req, res) {
-  res.render(path.resolve(__dirname + "/views/index"), {loc: info_arr});
+
+console.log(path.join(__dirname, '/views'));
+
+
+app.get("", function (req, res) {
+  res.render("index", {loc: info_arr});
 });
 
 app.listen(html_port, () => {
