@@ -12,13 +12,25 @@ var request = require("request");
 var cheerio = require("cheerio");
 var fs = require("fs");
 var https = require("https")
+require('dotenv').config();
+
+const redis = require("redis").createClient({
+  host: process.env.REDIS_IP,
+  port: process.env.REDIS_PORT,
+  password: process.env.REDIS_PASS
+});
+
+redis.on('connect', () => {
+  console.log('[PASS]'.green + 'Redis Connected');
+  require('bluebird').promisifyAll(redis)
+});
+
+//redis.HMSET('may 4, 11:44', "ip", "127.0.0.1", "lat", "long");
 
 let logger = log4js.getLogger();
 logger.level = process.env.DEBUG_LEVEL || "info";
 app.set('view engine', 'ejs');
 
-//TODO: add datamaps functionality
-//TODO: add https
 
 const port = 5001;
 const html_port = 3000;
@@ -90,6 +102,7 @@ async function retrieveLocationFromAPI(ip) {
 }
 
 async function doApiCall(ip) {
+  // TODO: Memoize into redis
   // Memoization, prevent API call for the same IP
   if (clients[ip]) {
     logger.debug(

@@ -16,3 +16,12 @@ nc -l -p 1999 | tee -a ssh.out
 
 
 looking at Deno
+
+what happens is once the connection to the rsyslog server is made the node application will cache all the attemps from the start of it 
+which means everyone gets the same page
+not real time yet
+one solution is to restart node every couple hours
+
+another thing I can do is set options for either NGinx access logs or ssh errors
+
+sudo awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -nr

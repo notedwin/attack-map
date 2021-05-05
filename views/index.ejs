@@ -25,11 +25,11 @@
         var lineFadeTime = 2000;
         var lineDrawTime = 850;
 
+        // hard coded: Chicago
         var dest = {
             latitude: 41.84,
             longitude: -87.64
         }
-
         var map = new Datamap({
                 scope: 'world',
                 element: document.getElementById('container'),
@@ -45,19 +45,21 @@
             var bubbles = [];
 
         //basic map config with custom fills, mercator projection
+        //instead of doing everything at one
+        //query the database for the 5 most recent Attacks every 20 seconds
+        // 
         async function demo() {
             
             // while still connected
             var i = 0;
-            var loc = <%- JSON.stringify(loc) %>;
-            console.log(loc[0].lat);
-            console.log(loc[0]);
-
+            var loc = <%- JSON.stringify(loc) %>; 
+            //parsing input
             while (i < loc.length) {
                 arcs.pop();
                 bubbles.pop();
                 bubbles.pop();
-                var {user,ip,port,long,lat} = loc[i];
+                var {user,ip,port,long,lat} = loc[i]; //add time
+                //once parsed
                 
                 arcs.push({
                     origin: {
