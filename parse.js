@@ -25,7 +25,12 @@ redis.on('connect', () => {
   require('bluebird').promisifyAll(redis)
 });
 
-//redis.HMSET('may 4, 11:44', "ip", "127.0.0.1", "lat", "long");
+redis.HMSET('may 4, 11:44', "ip", "127.0.0.1", "lat", "long");
+
+redis.HGETALL("may 4, 11:44", function(err, value) {
+  console.log(value.ip);
+  console.log(value.lat);
+});
 
 let logger = log4js.getLogger();
 logger.level = process.env.DEBUG_LEVEL || "info";
@@ -34,7 +39,10 @@ app.set('view engine', 'ejs');
 
 const port = 5001;
 const html_port = 3000;
-var info_arr = new Array();
+
+
+// the line below will go down as the worlds best database LOL xD
+var info_arr = new Array(); 
 
 app.use(express.static(__dirname + '/public'));
 //app.set('views', path.join(__dirname, '/views'));
@@ -43,6 +51,7 @@ app.set('views', path.join(__dirname, './views'));
 
 
 app.get("", function (req, res) {
+  // render based on 50 most recent access
   res.render("index", {loc: info_arr});
 });
 
@@ -50,6 +59,7 @@ app.listen(html_port, () => {
   console.log(`Example app listening at http://localhost:${html_port}`);
 });
 
+//database #2
 const clients = {};
 const API_URL = "http://ip-api.com/json/";
 // creates the server
@@ -57,6 +67,7 @@ var server = net.createServer();
 
 async function data2ip(data) {
   data_arr = data.toString().split(/[ ,]+/);
+  console.log("Clean : " + data_arr);
   if (data_arr[4] === "root" || data_arr[4] === "pi") {
     var user = data_arr[4];
     var ip = data_arr[6];
@@ -67,8 +78,18 @@ async function data2ip(data) {
     var port = data_arr.reverse()[1];
   }
 
+  // can keep this since we have the redis behind
   const ipLocation = await doApiCall(ip);
+  // once we use redis we can just do an array no need to deconstruct JSON
+  //lon = ipLocation[0]
+  //lat = ipLocation[1]
   const { lon, lat } = ipLocation;
+
+  
+
+  time = String(Math.floor(Date.now() / 1000));
+
+  //redis.HMSET(time,'user', user, 'ip', ip, 'port', port, 'long', lon, 'lat', lat)
 
   var res = { };
   res["user"] = user;
@@ -91,7 +112,6 @@ async function retrieveLocationFromAPI(ip) {
 
   // Sometimes the API returns empty values
   // defaulting every empty string to 'none'
-  // see https://github.com/acouvreur/ssh-log-to-influx/issues/35
   for (const key in data) {
     if (data[key] === "") {
       data[key] = "none";
@@ -103,7 +123,17 @@ async function retrieveLocationFromAPI(ip) {
 
 async function doApiCall(ip) {
   // TODO: Memoize into redis
+  // TODO: Check if IP is local so we don't waste time
   // Memoization, prevent API call for the same IP
+  //redis.HMSET()
+  // if (redis.EXISTS(ip)){
+  //    console.log('redis has this IP')
+  // redis.HGETALL(ip, function(err, value) {
+  //    return [value.lat,value.long];
+  //});
+  // return [0,0];
+  //}
+
   if (clients[ip]) {
     logger.debug(
       `Not making an API Call for ${ip}, using in memory from previous calls`,
@@ -115,6 +145,7 @@ async function doApiCall(ip) {
   try {
     const data = await retrieveLocationFromAPI(ip);
     clients[ip] = data;
+    // redis.HMSET(ip,'long', lon, 'lat', lat)
     return data;
   } catch (e) {
     logger.error(e);
@@ -175,7 +206,7 @@ server.on("error", function (error) {
 });
 
 server.on("listening", function () {
-  console.log("Server is listening!");
+  console.log("Log server is listening");
 });
 
 server.maxConnections = 10;
