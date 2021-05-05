@@ -58,18 +58,18 @@
                 arcs.pop();
                 bubbles.pop();
                 bubbles.pop();
-                var {user,ip,port,long,lat} = loc[i]; //add time
+                var {user,ip,port,lon,lat} = loc[i]; //add time
                 //once parsed
                 
                 arcs.push({
                     origin: {
                         latitude: lat,
-                        longitude: long
+                        longitude: lon
                     },
                     destination: dest
                 });
 
-                bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: long, radius: 5, fillKey: 'gt50' });
+                bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: lon, radius: 5, fillKey: 'gt50' });
 
                 bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
 
