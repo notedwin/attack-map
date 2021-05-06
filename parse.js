@@ -3,6 +3,7 @@ var Axios = require("axios");
 var express = require("express");
 var app = express();
 var path = require("path");
+const d3 = require("d3");
 require("dotenv").config();
 
 const redis = require("redis").createClient({
@@ -22,16 +23,25 @@ const port = process.env.LOG_PORT;
 const html_port = process.env.SERVER_PORT;
 
 // the line below will go down as the worlds best database LOL xD
-var info_arr = new Array();
 
 app.use(express.static(__dirname + "/public"));
 //app.set('views', path.join(__dirname, '/views'));
 
 app.set("views", path.join(__dirname, "./views"));
-
-app.get("", function (req, res) {
-  // TODO: render based on 50 most recent access
-  res.render("index", { loc: info_arr });
+// render based on 50 most recent access
+app.get("", async function (req, res) {
+  lat_long = new Array()
+  try{
+    min_ago = String(Math.floor((Date.now() - 30*60000) / 1000));
+    hackers = await redis.zrangebyscoreAsync("hackers", min_ago , "inf");
+    for (index = 0; index<hackers.length; ++index){
+      lat_long.push(await redis.hgetallAsync(hackers[index]));
+    }
+    console.log(hackers);
+  } catch(err){
+    console.log(err)
+  }
+  res.render("index", { loc: lat_long });
 });
 
 app.listen(html_port, () => {
@@ -39,7 +49,6 @@ app.listen(html_port, () => {
 });
 
 const API_URL = "http://ip-api.com/json/";
-// creates the server
 var server = net.createServer();
 
 async function data2ip(data) {
@@ -60,29 +69,8 @@ async function data2ip(data) {
 
   time = String(Math.floor(Date.now() / 1000));
 
-  redis.HMSET(
-    time,
-    "user",
-    user,
-    "ip",
-    ip,
-    "port",
-    port,
-    "lon",
-    lon,
-    "lat",
-    lat
-  );
-
-  var res = {};
-  res["user"] = user;
-  res["ip"] = ip;
-  res["port"] = port;
-  res["lon"] = lon;
-  res["lat"] = lat;
-
-  info_arr.push(res);
-
+  redis.HMSET(time,"user",user,"ip",ip,"port",port,"lon",lon,"lat",lat);
+  redis.zadd("hackers",time,time);
 }
 
 async function retrieveLocationFromAPI(ip) {
@@ -101,18 +89,14 @@ async function retrieveLocationFromAPI(ip) {
 }
 
 async function doApiCall(ip) {
-  // TODO: Check if IP is local so we don't waste time
+  // I don't know if this is the correct way to do async but it works
   // Memoization, prevent API call for the same IP
-  try{
-    redis.EXISTSAsync(ip, function (err, value) {
-      if (err) throw err;
-      console.log("redis has the IP");
-      redis.HGETALLAsync(ip, function (err, value) {
-        if (err) throw err;
-        return { lon:value.lon, lat:value.lat };
-      });
-    });
-  } catch (e) {
+  exists = await redis.existsAsync(ip);
+  if (exists == 1) {
+    console.log("redis has the IP");
+    data = await redis.hgetallAsync(ip);
+    return { lon: data.lon, lat: data.lat };
+  } else {
     const data = await retrieveLocationFromAPI(ip);
     console.log(data);
     redis.HMSET(ip, "lon", data.lon, "lat", data.lat);
