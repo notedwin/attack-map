@@ -14,6 +14,7 @@
 
 <body>
     <h1>Attack Map</h1>
+    <h2>Attacks today: <%- loc.length %></h2>
     <a href="https://edwin.computer">Go to Edwin's Home page</a>
     <div id="container" style="position: relative; width: 100%;"></div>
     <script>
@@ -30,14 +31,70 @@
             latitude: 41.84,
             longitude: -87.64
         }
+        var loc = <%- JSON.stringify(loc) %>; 
+        //basic map config with custom fills, mercator projection
+        //instead of doing everything at one
+        //query the database for the 5 most recent Attacks every 20 seconds
+        // 
+        var _table_ = document.createElement('table'),
+            _tr_ = document.createElement('tr'),
+            _th_ = document.createElement('th'),
+            _td_ = document.createElement('td');
+
+        // Builds the HTML Table out of myList json data from Ivy restful service.
+        function buildHtmlTable(arr) {
+            var table = _table_.cloneNode(false),
+                columns = addAllColumnHeaders(arr, table);
+            for (var i = 0, maxi = arr.length; i < maxi; ++i) {
+                var tr = _tr_.cloneNode(false);
+                for (var j = 0, maxj = columns.length; j < maxj; ++j) {
+                    var td = _td_.cloneNode(false);
+                    cellValue = arr[i][columns[j]];
+                    td.appendChild(document.createTextNode(arr[i][columns[j]] || ''));
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+            return table;
+        }
+
+        // Adds a header row to the table and returns the set of columns.
+        // Need to do union of keys from all records as some records may not contain
+        // all records
+        function addAllColumnHeaders(arr, table) {
+            var columnSet = [],
+                tr = _tr_.cloneNode(false);
+            for (var i = 0, l = arr.length; i < l; i++) {
+                for (var key in arr[i]) {
+                    if (arr[i].hasOwnProperty(key) && columnSet.indexOf(key) === -1) {
+                        columnSet.push(key);
+                        var th = _th_.cloneNode(false);
+                        th.appendChild(document.createTextNode(key));
+                        tr.appendChild(th);
+                    }
+                }
+            }
+            table.appendChild(tr);
+            return columnSet;
+        }
+
+        user_ip_time = JSON.parse(JSON.stringify(loc));
+        for (index=0; index<loc.length; ++index){
+            delete user_ip_time[index].port;
+            delete user_ip_time[index].lat;
+            delete user_ip_time[index].lon;
+        }
+
+        document.body.appendChild(buildHtmlTable(user_ip_time));
+
         var map = new Datamap({
                 scope: 'world',
                 element: document.getElementById('container'),
                 projection: 'mercator',
                 responsive: true,
                 fills: {
-                    defaultFill: "#CCC",
-                    gt50:"#FF0000"
+                    defaultFill: "#DDDDDD", //#ABDDA4
+                    gt50:"#222222"
                 }
             })
 
@@ -45,16 +102,15 @@
             var bubbles = [];
 
         //basic map config with custom fills, mercator projection
-        //instead of doing everything at one
-        //query the database for the 5 most recent Attacks every 20 seconds
-        // 
         async function demo() {
             
             // while still connected
             var i = 0;
-            var loc = <%- JSON.stringify(loc) %>; 
             //parsing input
             while (i < loc.length) {
+                arcs.pop();
+                bubbles.pop();
+                bubbles.pop();
                 arcs.pop();
                 bubbles.pop();
                 bubbles.pop();
@@ -73,7 +129,8 @@
 
                 bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
 
-                map.arc(arcs, { strokeWidth: 5, strokeColor: '#000000' });
+                rand = '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');                
+                map.arc(arcs, { strokeWidth: 5, strokeColor: rand });
                 map.bubbles(bubbles, {
                     popupTemplate: function (geo, data) {
                         return "<div class='hoverinfo'> user: " +data.user +" on port: "+ data.port +" from: " + data.ip + "</div>";
@@ -82,9 +139,6 @@
                 map.svg.selectAll('path.datamaps-arc').attr("opacity", 1);
                 map.svg.selectAll('path.datamaps-arc').transition().duration(5000).style("opacity", 0);
                 map.svg.selectAll('path.datamaps-arc').transition().delay(5000).remove();
-                //map.svg.selectAll('circle.datamaps-bubble').attr("opacity", 1);
-                //map.svg.selectAll('circle.datamaps-bubble').transition().duration//(1000).style("opacity", 0);
-                //map.svg.selectAll('circle.datamaps-bubble').transition().delay//(10000).remove();
                 await sleep(5000);
                 i++;
             }

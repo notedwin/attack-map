@@ -3,7 +3,6 @@ var Axios = require("axios");
 var express = require("express");
 var app = express();
 var path = require("path");
-const d3 = require("d3");
 require("dotenv").config();
 
 const redis = require("redis").createClient({
@@ -30,16 +29,23 @@ app.use(express.static(__dirname + "/public"));
 app.set("views", path.join(__dirname, "./views"));
 // render based on 50 most recent access
 app.get("", async function (req, res) {
-  lat_long = new Array()
-  try{
-    min_ago = String(Math.floor((Date.now() - 30*60000) / 1000));
-    hackers = await redis.zrangebyscoreAsync("hackers", min_ago , "inf");
-    for (index = 0; index<hackers.length; ++index){
-      lat_long.push(await redis.hgetallAsync(hackers[index]));
+  lat_long = new Array();
+  try {
+    min_ago = String(Math.floor((Date.now() - 1440 * 60000) / 1000));
+    hackers = await redis.zrangebyscoreAsync("hackers", min_ago, "inf");
+    for (var index = 0; index < hackers.length; ++index) {
+      hacker = await redis.hgetallAsync(hackers[index]);
+      var date = new Date(hackers[index] * 1000);
+      var hours = date.getHours();
+      var minutes = "0" + date.getMinutes();
+      var seconds = "0" + date.getSeconds();
+      var formattedTime = hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
+      hacker.time = formattedTime;
+      lat_long.push(hacker);
     }
     console.log(hackers);
-  } catch(err){
-    console.log(err)
+  } catch (err) {
+    console.log(err);
   }
   res.render("index", { loc: lat_long });
 });
@@ -69,8 +75,20 @@ async function data2ip(data) {
 
   time = String(Math.floor(Date.now() / 1000));
 
-  redis.HMSET(time,"user",user,"ip",ip,"port",port,"lon",lon,"lat",lat);
-  redis.zadd("hackers",time,time);
+  redis.HMSET(
+    time,
+    "user",
+    user,
+    "ip",
+    ip,
+    "port",
+    port,
+    "lon",
+    lon,
+    "lat",
+    lat
+  );
+  redis.zadd("hackers", time, time);
 }
 
 async function retrieveLocationFromAPI(ip) {
@@ -105,39 +123,17 @@ async function doApiCall(ip) {
   }
 }
 
-//emitted when server closes ...not emitted until all connections closes.
 server.on("close", function () {
   console.log("Server closed !");
 });
 
-// emitted when new client connects
 server.on("connection", function (socket) {
   console.log("connect to log server.");
 
-  socket.setEncoding("utf8");
-
-  socket.setTimeout(800000, function () {
-    console.log("Socket timed out");
-  });
-
   socket.on("data", async function (data) {
-    //without this the data from log has nowhere to go
     await data2ip(data);
   });
 
-  socket.on("error", function (error) {
-    console.log("Error : " + error);
-  });
-
-  socket.on("timeout", function () {
-    console.log("Socket timed out !");
-    socket.end("Timed out!");
-  });
-
-  socket.on("end", function (data) {
-    console.log("Socket ended from other end!");
-    console.log("End data : " + data);
-  });
 
   socket.on("close", function (error) {
     console.log("Socket closed!");
@@ -146,25 +142,10 @@ server.on("connection", function (socket) {
     }
   });
 
-  setTimeout(function () {
-    var isdestroyed = socket.destroyed;
-    console.log("Socket destroyed:" + isdestroyed);
-    socket.destroy();
-  }, 1200000);
-});
-
-server.on("error", function (error) {
-  console.log("Error: " + error);
 });
 
 server.on("listening", function () {
   console.log("Log server is listening");
 });
 
-server.maxConnections = 10;
-
 server.listen(port);
-
-setTimeout(function () {
-  server.close();
-}, 5000000);

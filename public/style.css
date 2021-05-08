@@ -1,8 +1,55 @@
-h1 {
-    color: red;
-    text-align:center;
+:root {
+  /*colors*/
+  --background: #ffffff;
+  --accents: #222222; /**/
+  --highlights: #ff0000;
+  --text: #222222;
+
+  /*fonts*/
+  --titleFont: "InterDisplay";
+  --serifFont: "Lato";
+  --fontSize: 2rem;
 }
 
-a{
-    text-decoration: none;
+html {
+  font-family: var(--serifFont), -system-ui, system-ui, sans-serif;
+  font-size: 62.5%;
+  color: var(--text);
+  margin: 0 auto;
+  text-decoration: none;
+}
+
+h1 {
+  font-family: var(--titleFont), "Raleway", "HelveticaNeue", "Helvetica Neue";
+  font-size: 5rem;
+  font-weight: bold;
+  margin: auto 0;
+  text-align: center;
+}
+
+h1 {font-size: 5rem;}
+h2 {font-size: 3rem;}
+
+table {
+  width: 100%;
+  position: relative;
+  height: 150px;
+  overflow: auto;
+  margin-top: 20px;
+  background: #EEEEEE;
+  text-align: center;
+}
+
+a {
+    font-size: 2rem;
+}
+
+th {
+  font-size: 2rem;
+  height: 20px;
+  width: 25rem;
+}
+
+td {
+    font-size: 2rem;
 }

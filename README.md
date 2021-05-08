@@ -30,3 +30,5 @@ npm start
 # TODO:
 
 Front-end is questionable, It does the job but maybe change it to a globe in the future.
+Show attempts with timestamp at bottom.
+Show a message when the last arc is displayed so people don't think the app doesn't work.
