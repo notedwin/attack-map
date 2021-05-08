@@ -148,4 +148,4 @@ server.on("listening", function () {
   console.log("Log server is listening");
 });
 
-server.listen(port);
+server.listen(port, '127.0.0.1');
