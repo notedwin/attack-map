@@ -28,6 +28,30 @@ app.use(express.static(__dirname + "/public"));
 
 app.set("views", path.join(__dirname, "./views"));
 // render based on 50 most recent access
+
+app.get("/globe", async function (req, res) {
+  lat_long = new Array();
+  try {
+    min_ago = String(Math.floor((Date.now() - 1440 * 60000) / 1000));
+    hackers = await redis.zrangebyscoreAsync("hackers", min_ago, "inf");
+    for (var index = 0; index < hackers.length; ++index) {
+      hacker = await redis.hgetallAsync(hackers[index]);
+      var date = new Date(hackers[index] * 1000);
+      var hours = date.getHours();
+      var minutes = "0" + date.getMinutes();
+      var seconds = "0" + date.getSeconds();
+      var formattedTime = hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
+      hacker.time = formattedTime;
+      lat_long.push(hacker);
+    }
+    console.log(hackers);
+  } catch (err) {
+    console.log(err);
+  }
+  res.render("globe", { loc: lat_long });
+});
+
+
 app.get("", async function (req, res) {
   lat_long = new Array();
   try {
