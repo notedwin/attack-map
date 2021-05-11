@@ -51,6 +51,16 @@ app.get("/globe", async function (req, res) {
   res.render("globe", { loc: lat_long });
 });
 
+app.get("/nginx", async function (req, res) {
+  lat_long = new Array();
+  try {
+  } catch (err) {
+    console.log(err);
+  }
+  res.render("globe", { loc: lat_long });
+});
+
+
 
 app.get("", async function (req, res) {
   lat_long = new Array();
