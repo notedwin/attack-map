@@ -19,68 +19,89 @@ redis.on("connect", () => {
 app.set("view engine", "ejs");
 
 app.use(express.static(__dirname + "/public"));
-//app.set('views', path.join(__dirname, '/views'));
 
 app.set("views", path.join(__dirname, "./views"));
 
 // render based on 50 most recent access
 //make it render real-time?
-async function getData() {
+async function getData(lat_long) {
   try {
-    lat_long = new Array();
     min_ago = String(Math.floor((Date.now() - 1440 * 60000) / 1000));
     hackers = await redis.zrangebyscoreAsync("hackers", min_ago, "inf");
     for (var index = 0; index < hackers.length; ++index) {
       hacker = await redis.hgetallAsync(hackers[index]);
+      if (hacker === null) {
+        break;
+      }
+      hacker.dest = Math.floor(Math.random() * 2);
+
       var date = new Date(hackers[index] * 1000);
       var hours = date.getHours();
       var minutes = "0" + date.getMinutes();
       var seconds = "0" + date.getSeconds();
-      var formattedTime = hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
+      var formattedTime =
+        hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
       hacker.time = formattedTime;
       lat_long.push(hacker);
     }
-    return lat_long
   } catch (err) {
     console.log(err);
   }
 }
 
 app.get("/globe", async function (req, res) {
-  lat_long = await getData();
-  console.log(lat_long);
+  lat_long = new Array();
+  await getData(lat_long);
   res.render("globe", { loc: lat_long });
 });
 
 app.get("", async function (req, res) {
-  lat_long = await getData();
-  console.log(lat_long);
+  lat_long = new Array();
+  await getData(lat_long);
   res.render("index", { loc: lat_long });
 });
 
 async function populateRedis(ip, user, port, server) {
   // I don't know if this is the correct way to do async but it works
   // Memoization, prevent API call for the same IP
-  try{
+  try {
     var data = {};
     exists = await redis.existsAsync(ip);
     if (exists == 1) {
       data = await redis.hgetallAsync(ip);
     } else {
       const API_URL = "http://ip-api.com/json/";
-      const { data, status, statusText } = await Axios.get(`${API_URL}/${ip}`);
+      var { data, status, statusText } = await Axios.get(`${API_URL}/${ip}`);
       if (!data || status !== 200 || data.status !== "success") {
         throw new Error(`Unsuccessful request (${status}): ${data}`);
       }
+      for (const key in data) {
+        if (data[key] === "") {
+          data[key] = "none";
+        }
+      }
     }
-
-    console.log(data,server);
+    
     time = String(Math.floor(Date.now() / 1000));
 
     redis.HMSET(ip, "lon", data.lon, "lat", data.lat);
-    redis.HMSET(time,"user",user,"ip",ip,"port",port,"lon",data.lon,"lat",data.lat,"dest",server);
+    redis.HMSET(
+      time,
+      "user",
+      user,
+      "ip",
+      ip,
+      "port",
+      port,
+      "lon",
+      data.lon,
+      "lat",
+      data.lat,
+      "dest",
+      server
+    );
     redis.zadd("hackers", time, time);
-  }catch (err) {
+  } catch (err) {
     console.log(err);
   }
 }
@@ -93,8 +114,6 @@ var server_c = net.createServer();
 var server_n = net.createServer();
 
 server.on("connection", function (socket) {
-  console.log("connect to log server.");
-
   socket.on("data", async function (data) {
     data_arr = data.toString().split(/[ ,]+/);
     //insecure put this in .env
@@ -107,13 +126,11 @@ server.on("connection", function (socket) {
       var ip = data_arr[8];
       var port = data_arr.reverse()[1];
     }
-    await populateRedis(ip, user, port,1);
+    await populateRedis(ip, user, port, 1);
   });
 });
 
 server_c.on("connection", function (socket) {
-  console.log("connect to log server.");
-
   socket.on("data", async function (data) {
     p = data
       .toString()
@@ -123,12 +140,7 @@ server_c.on("connection", function (socket) {
     var user = p[2];
     var ip = p[6];
     var port = Math.floor(Math.random() * (6000 - 1024 + 1)) + 1024;
-    console.log(user,ip,port)
-    await populateRedis(ip,user,port,2);
-  });
-
-  socket.on("close", function (error) {
-    console.log("Socket closed!");
+    await populateRedis(ip, user, port, 2);
   });
 });
 
@@ -137,18 +149,12 @@ server_n.on("connection", function (socket) {
 
   socket.on("data", async function (data) {
     data_arr = JSON.parse(data.toString().substring(40));
-    var port = Math.floor(Math.random() * (6000 - 1024 + 1)) + 1024;;
+    var port = Math.floor(Math.random() * (6000 - 1024 + 1)) + 1024;
     var user = "chrome";
     var ip = data_arr.remote_addr;
-    console.log(port,user,ip)
-    await populateRedis(ip,user,port,1);
-  });
-
-  socket.on("close", function (error) {
-    console.log("Socket closed!");
+    await populateRedis(ip, user, port, 1);
   });
 });
-
 
 //nginx logs
 server_n.listen(process.env.NGINX, () => {

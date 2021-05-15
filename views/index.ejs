@@ -13,10 +13,14 @@
 </head>
 
 <body>
+    <nav>
     <h1>Attack Map</h1>
-    <h2>Attacks today: <%- loc.length %>
-    </h2>
+    <h2>Attacks today: <%- loc.length %></h2>
     <a href="https://edwin.computer">Go to Edwin's Home page</a>
+    <a href="https://map.edwin.computer/globe">Go to Globe Visualization</a>
+    </nav>
+    
+
     <div id="container" style="position: relative; width: 100%;"></div>
     <script>
         //currently shows the locations based on when the server started
@@ -28,7 +32,7 @@
         var lineDrawTime = 850;
 
         // hard coded: Chicago
-        var dest = [{ latitude: 41.84, longitude: -87.64}, {latitude: 39.04,longitude: -77.47}];
+        var server = [{ latitude: 41.84, longitude: -87.64}, {latitude: 39.04,longitude: -77.47}];
 
         var loc = <%- JSON.stringify(loc) %>;
         //basic map config with custom fills, mercator projection
@@ -113,7 +117,7 @@
                 arcs.pop();
                 bubbles.pop();
                 bubbles.pop();
-                var { user, ip, port, lon, lat, dest_i} = loc[i]; //add time
+                var { user, ip, port, lon, lat, dest} = loc[i]; //add time
                 //once parsed
 
                 arcs.push({
@@ -126,7 +130,7 @@
 
                 bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: lon, radius: 5, fillKey: 'gt50' });
 
-                bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: dest[dest_i]["latitude"], longitude: dest[dest_i]["longitude"], radius: 5, fillKey: 'gt50' });
+                bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: server[dest].latitude, longitude: server[dest].longitude, radius: 5, fillKey: 'gt50' });
 
                 rand = '#' + (Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
                 map.arc(arcs, { strokeWidth: 5, strokeColor: rand });
