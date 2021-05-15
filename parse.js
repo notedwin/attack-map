@@ -33,7 +33,7 @@ async function getData(lat_long) {
       if (hacker === null) {
         break;
       }
-      hacker.dest = Math.floor(Math.random() * 2);
+      //hacker.dest = Math.floor(Math.random() * 2);
 
       var date = new Date(hackers[index] * 1000);
       var hours = date.getHours();
@@ -80,11 +80,10 @@ async function populateRedis(ip, user, port, server) {
           data[key] = "none";
         }
       }
+      redis.HMSET(ip, "lon", data.lon, "lat", data.lat);
     }
     
     time = String(Math.floor(Date.now() / 1000));
-
-    redis.HMSET(ip, "lon", data.lon, "lat", data.lat);
     redis.HMSET(
       time,
       "user",
@@ -126,7 +125,7 @@ server.on("connection", function (socket) {
       var ip = data_arr[8];
       var port = data_arr.reverse()[1];
     }
-    await populateRedis(ip, user, port, 1);
+    await populateRedis(ip, user, port, 0);
   });
 });
 
@@ -140,7 +139,7 @@ server_c.on("connection", function (socket) {
     var user = p[2];
     var ip = p[6];
     var port = Math.floor(Math.random() * (6000 - 1024 + 1)) + 1024;
-    await populateRedis(ip, user, port, 2);
+    await populateRedis(ip, user, port, 1);
   });
 });
 
@@ -152,7 +151,7 @@ server_n.on("connection", function (socket) {
     var port = Math.floor(Math.random() * (6000 - 1024 + 1)) + 1024;
     var user = "chrome";
     var ip = data_arr.remote_addr;
-    await populateRedis(ip, user, port, 1);
+    await populateRedis(ip, user, port, 0);
   });
 });
 
