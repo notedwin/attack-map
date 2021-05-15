@@ -151,7 +151,10 @@ server_n.on("connection", function (socket) {
     var port = Math.floor(Math.random() * (6000 - 1024 + 1)) + 1024;
     var user = "chrome";
     var ip = data_arr.remote_addr;
-    await populateRedis(ip, user, port, 0);
+    //do not populate redis with nginx attempts
+    //create a new map and do this instead so we don't mix data
+    //when you do this flushdb
+    //await populateRedis(ip, user, port, 0);
   });
 });
 

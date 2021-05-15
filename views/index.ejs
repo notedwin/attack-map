@@ -14,12 +14,13 @@
 
 <body>
     <nav>
-    <h1>Attack Map</h1>
-    <h2>Attacks today: <%- loc.length %></h2>
-    <a href="https://edwin.computer">Go to Edwin's Home page</a>
-    <a href="https://map.edwin.computer/globe">Go to Globe Visualization</a>
+        <h1>Attack Map</h1>
+        <h2>Attacks today: <%- loc.length %>
+        </h2>
+        <a href="https://edwin.computer">Go to Edwin's Home page</a>
+        <a href="https://map.edwin.computer/globe">Go to Globe Visualization</a>
     </nav>
-    
+
 
     <div id="container" style="position: relative; width: 100%;"></div>
     <script>
@@ -32,7 +33,7 @@
         var lineDrawTime = 850;
 
         // hard coded: Chicago
-        var server = [{ latitude: 41.84, longitude: -87.64}, {latitude: 39.04,longitude: -77.47}];
+        var server = [{ latitude: 41.84, longitude: -87.64 }, { latitude: 39.04, longitude: -77.47 }];
 
         var loc = <%- JSON.stringify(loc) %>;
         //basic map config with custom fills, mercator projection
@@ -86,6 +87,7 @@
             delete user_ip_time[index].port;
             delete user_ip_time[index].lat;
             delete user_ip_time[index].lon;
+            delete user_ip_time[index].dest;
         }
 
         document.body.appendChild(buildHtmlTable(user_ip_time));
@@ -117,7 +119,7 @@
                 arcs.pop();
                 bubbles.pop();
                 bubbles.pop();
-                var { user, ip, port, lon, lat, dest} = loc[i]; //add time
+                var { user, ip, port, lon, lat,time, dest } = loc[i]; //add time
                 //once parsed
 
                 arcs.push({
@@ -125,7 +127,9 @@
                         latitude: lat,
                         longitude: lon
                     },
-                    destination: dest
+                    destination: {
+                        latitude: server[dest].latitude, longitude: server[dest].longitude
+                    }
                 });
 
                 bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: lon, radius: 5, fillKey: 'gt50' });
