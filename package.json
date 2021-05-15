@@ -20,27 +20,14 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bluebird": "^3.7.2",
-    "cheerio": "^1.0.0-rc.5",
-    "d3": "^6.5.0",
-    "datamaps": "^0.5.9",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "globe.gl": "^2.21.2",
-    "log4js": "^6.3.0",
-    "mongodb": "^3.6.6",
-    "redis": "^3.1.2",
-    "sequelize": "^6.6.2",
-    "tail": "^2.0.4",
-    "topojson": "^3.0.2",
-    "topojson-client": "^3.1.0",
-    "topojson-server": "^3.0.1",
-    "topojson-simplify": "^3.0.3",
-    "window": "^4.2.7"
+    "redis": "^3.1.2"
   },
   "devDependencies": {
     "curl": "^0.1.4",
-    "jquery": "^3.5.1",
-    "jsdom": "^16.4.0"
+    "sass": "^1.32.13"
   }
 }

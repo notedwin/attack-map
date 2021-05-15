@@ -1,14 +1,22 @@
 :root {
   /*colors*/
-  --background: #ffffff;
+  --background: #ececee;
   --accents: #222222; /**/
   --highlights: #ff0000;
-  --text: #222222;
+  --text: #2c2c2c;
 
   /*fonts*/
   --titleFont: "InterDisplay";
   --serifFont: "Lato";
   --fontSize: 2rem;
+
+  --spacing-full: 30px;
+  --spacing-half: $spacing-full / 2;
+
+  --on-mobile: 768px;
+  --on-tablet: 769px;
+  --on-desktop: 1024px;
+  --on-widescreen: 1152px;
 }
 
 html {
@@ -17,6 +25,7 @@ html {
   color: var(--text);
   margin: 0 auto;
   text-decoration: none;
+  max-width: 1000px;
 }
 
 h1 {
@@ -27,8 +36,12 @@ h1 {
   text-align: center;
 }
 
-h1 {font-size: 5rem;}
-h2 {font-size: 3rem;}
+h1 {
+  font-size: 5rem;
+}
+h2 {
+  font-size: 3rem;
+}
 
 table {
   width: 100%;
@@ -36,12 +49,12 @@ table {
   height: 150px;
   overflow: auto;
   margin-top: 20px;
-  background: #EEEEEE;
+  background: #eeeeee;
   text-align: center;
 }
 
 a {
-    font-size: 2rem;
+  font-size: 2rem;
 }
 
 th {
@@ -51,5 +64,5 @@ th {
 }
 
 td {
-    font-size: 2rem;
+  font-size: 2rem;
 }

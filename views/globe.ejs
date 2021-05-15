@@ -22,6 +22,13 @@
         const OPACITY = 0.44;
 
         var loc = <%- JSON.stringify(loc) %>;
+        var dest = [{
+            latitude: 41.84,
+            longitude: -87.64
+        }, {
+            latitude: 39.04,
+            longitude: -77.47
+        }]
 
 
         const myGlobe = Globe()
@@ -32,8 +39,8 @@
             .arcsData(loc)
             .arcStartLat(d => +d.lat)
             .arcStartLng(d => +d.lon)
-            .arcEndLat(41.84)
-            .arcEndLng(-87.64)
+            .arcEndLat(d => dest[d.dest].latitude)
+            .arcEndLng(d => dest[d.dest].longitude)
             .arcDashLength(0.25)
             .arcDashGap(1)
             .arcDashInitialGap(() => Math.random())

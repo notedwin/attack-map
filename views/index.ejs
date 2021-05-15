@@ -14,7 +14,8 @@
 
 <body>
     <h1>Attack Map</h1>
-    <h2>Attacks today: <%- loc.length %></h2>
+    <h2>Attacks today: <%- loc.length %>
+    </h2>
     <a href="https://edwin.computer">Go to Edwin's Home page</a>
     <div id="container" style="position: relative; width: 100%;"></div>
     <script>
@@ -27,11 +28,9 @@
         var lineDrawTime = 850;
 
         // hard coded: Chicago
-        var dest = {
-            latitude: 41.84,
-            longitude: -87.64
-        }
-        var loc = <%- JSON.stringify(loc) %>; 
+        var dest = [{ latitude: 41.84, longitude: -87.64}, {latitude: 39.04,longitude: -77.47}];
+
+        var loc = <%- JSON.stringify(loc) %>;
         //basic map config with custom fills, mercator projection
         //instead of doing everything at one
         //query the database for the 5 most recent Attacks every 20 seconds
@@ -79,7 +78,7 @@
         }
 
         user_ip_time = JSON.parse(JSON.stringify(loc));
-        for (index=0; index<loc.length; ++index){
+        for (index = 0; index < loc.length; ++index) {
             delete user_ip_time[index].port;
             delete user_ip_time[index].lat;
             delete user_ip_time[index].lon;
@@ -88,22 +87,22 @@
         document.body.appendChild(buildHtmlTable(user_ip_time));
 
         var map = new Datamap({
-                scope: 'world',
-                element: document.getElementById('container'),
-                projection: 'mercator',
-                responsive: true,
-                fills: {
-                    defaultFill: "#DDDDDD", //#ABDDA4
-                    gt50:"#222222"
-                }
-            })
+            scope: 'world',
+            element: document.getElementById('container'),
+            projection: 'mercator',
+            responsive: true,
+            fills: {
+                defaultFill: "#DDDDDD", //#ABDDA4
+                gt50: "#222222"
+            }
+        })
 
-            var arcs = [];
-            var bubbles = [];
+        var arcs = [];
+        var bubbles = [];
 
         //basic map config with custom fills, mercator projection
         async function demo() {
-            
+
             // while still connected
             var i = 0;
             //parsing input
@@ -114,9 +113,9 @@
                 arcs.pop();
                 bubbles.pop();
                 bubbles.pop();
-                var {user,ip,port,lon,lat} = loc[i]; //add time
+                var { user, ip, port, lon, lat, dest_i} = loc[i]; //add time
                 //once parsed
-                
+
                 arcs.push({
                     origin: {
                         latitude: lat,
@@ -127,13 +126,13 @@
 
                 bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: lon, radius: 5, fillKey: 'gt50' });
 
-                bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: dest["latitude"], longitude: dest["longitude"], radius: 5, fillKey: 'gt50' });
+                bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: dest[dest_i]["latitude"], longitude: dest[dest_i]["longitude"], radius: 5, fillKey: 'gt50' });
 
-                rand = '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');                
+                rand = '#' + (Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
                 map.arc(arcs, { strokeWidth: 5, strokeColor: rand });
                 map.bubbles(bubbles, {
                     popupTemplate: function (geo, data) {
-                        return "<div class='hoverinfo'> user: " +data.user +" on port: "+ data.port +" from: " + data.ip + "</div>";
+                        return "<div class='hoverinfo'> user: " + data.user + " on port: " + data.port + " from: " + data.ip + "</div>";
                     }
                 });
                 map.svg.selectAll('path.datamaps-arc').attr("opacity", 1);
