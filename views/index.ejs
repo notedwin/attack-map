@@ -15,10 +15,9 @@
 <body>
     <nav>
         <h1>Attack Map</h1>
-        <h2>Attacks today: <%- loc.length %>
-        </h2>
-        <a href="https://edwin.computer">Go to Edwin's Home page</a>
-        <a href="https://map.edwin.computer/globe">Go to Globe Visualization</a>
+        <a>Attacks today: <%- loc.length %></a>
+        <a href="https://edwin.computer">Home page</a>
+        <a href="https://map.edwin.computer/globe">Globe Visualization</a>
     </nav>
 
 
@@ -92,14 +91,25 @@
 
         document.body.appendChild(buildHtmlTable(user_ip_time));
 
+        var style = getComputedStyle(document.body)
+
+
         var map = new Datamap({
+            responsive: true,
             scope: 'world',
             element: document.getElementById('container'),
             projection: 'mercator',
             responsive: true,
             fills: {
-                defaultFill: "#DDDDDD", //#ABDDA4
-                gt50: "#222222"
+                defaultFill: style.getPropertyValue('--text'),
+                black: style.getPropertyValue('--background')
+            }
+            ,geographyConfig: {
+                hideAntarctica: false,
+                borderColor: style.getPropertyValue('--background'),
+                highlightFillColor: style.getPropertyValue('--accent'),
+                highlightBorderColor: style.getPropertyValue('--accent'),
+                popupOnHover: false, //disable the popup while hovering
             }
         })
 
@@ -119,7 +129,7 @@
                 arcs.pop();
                 bubbles.pop();
                 bubbles.pop();
-                var { user, ip, port, lon, lat,time, dest } = loc[i]; //add time
+                var { user, ip, port, lon, lat, time, dest } = loc[i]; //add time
                 //once parsed
 
                 arcs.push({
@@ -132,11 +142,12 @@
                     }
                 });
 
-                bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: lon, radius: 5, fillKey: 'gt50' });
-
-                bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: server[dest].latitude, longitude: server[dest].longitude, radius: 5, fillKey: 'gt50' });
-
                 rand = '#' + (Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0');
+
+                bubbles.push({ user: user, port: port, ip: ip, latitude: lat, longitude: lon, radius: 5 , fillKey: 'black'});
+
+                bubbles.push({ user: "edwin", port: "22", ip: 'localhost', latitude: server[dest].latitude, longitude: server[dest].longitude, radius: 5, fillKey: 'black'});
+
                 map.arc(arcs, { strokeWidth: 5, strokeColor: rand });
                 map.bubbles(bubbles, {
                     popupTemplate: function (geo, data) {

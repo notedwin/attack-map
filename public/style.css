@@ -1,47 +1,40 @@
 :root {
   /*colors*/
-  --background: #ececee;
-  --accents: #222222; /**/
-  --highlights: #ff0000;
-  --text: #2c2c2c;
-
+  /*--background: #ececee;
+  /*--text: #2c2c2c;
   /*fonts*/
+
+  --background: #222;
+  --text: #ececee;
+  --accent: #ff6d6b;
+
   --titleFont: "InterDisplay";
   --serifFont: "Lato";
   --fontSize: 2rem;
-
-  --spacing-full: 30px;
-  --spacing-half: $spacing-full / 2;
-
-  --on-mobile: 768px;
-  --on-tablet: 769px;
-  --on-desktop: 1024px;
-  --on-widescreen: 1152px;
 }
 
 html {
-  font-family: var(--serifFont), -system-ui, system-ui, sans-serif;
+  font-family: var(--titleFont), -system-ui, system-ui, sans-serif;
   font-size: 62.5%;
   color: var(--text);
   margin: 0 auto;
   text-decoration: none;
   max-width: 1000px;
+  background-color: var(--background);
+}
+
+body{
+  box-shadow: 0 0 0 5rem var(--background);
 }
 
 h1 {
   font-family: var(--titleFont), "Raleway", "HelveticaNeue", "Helvetica Neue";
-  font-size: 5rem;
+  font-size: 2.75rem;
   font-weight: bold;
   margin: auto 0;
   text-align: center;
 }
 
-h1 {
-  font-size: 5rem;
-}
-h2 {
-  font-size: 3rem;
-}
 
 table {
   width: 100%;
@@ -49,73 +42,44 @@ table {
   height: 150px;
   overflow: auto;
   margin-top: 20px;
-  background: #ececec;
   text-align: center;
+  font-size: var(--fontSize);
 }
 
-a {
-  font-size: 2rem;
-}
 
 th {
-  font-size: 2rem;
   height: 20px;
   width: 25rem;
-}
-
-td {
-  font-size: 2rem;
+  font-size: var(--fontSize);
 }
 
 nav {
-  background-color: #ececec;
   display: flex;
+  justify-content: space-evenly;
   height: auto;
-  margin-right: auto;
-  margin-left: auto;
+  margin: auto;
   border-bottom: 1px solid #3f3f3f;
   align-items: center;
   -webkit-transition: 0.3s ease-out;
   transition: 0.3s ease-out;
-}
-nav > h2 {
-  color: #222;
-  text-decoration: none;
-  padding: 5px 8px;
-  opacity: 0.85;
-  letter-spacing: 0.3px;
-  text-align: center;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  &:not(:last-child) {
-    margin-right: 5px;
-  }
-
-  @include media-query($on-mobile) {
-    opacity: 0.8;
-  }
+  max-width: 1000px;
 }
 
 nav > a {
-  color: #222;
+  color: var(--text);
   text-decoration: none;
-  padding: 5px 8px;
+  padding: 5px 4px;
   opacity: 0.85;
-  letter-spacing: 0.3px;
   text-align: center;
+  font-size: var(--fontSize);
+}
 
-  &:hover {
-    opacity: 1;
-  }
+a:hover{
+  opacity: 1;
+  background-color: var(--accent);
+}
 
-  &:not(:last-child) {
-    margin-right: 5px;
-  }
-
-  @include media-query($on-mobile) {
-    opacity: 0.8;
-  }
+div.hoverinfo{
+  background-color: var(--background);
+  color: var(--text);
 }
