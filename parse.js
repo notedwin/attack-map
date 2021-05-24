@@ -3,6 +3,7 @@ var Axios = require("axios");
 var express = require("express");
 var app = express();
 var path = require("path");
+const { filter } = require("bluebird");
 require("dotenv").config();
 
 const redis = require("redis").createClient({
@@ -49,6 +50,20 @@ async function getData(lat_long) {
   }
 }
 
+function filter_data(data) {
+  // return unique attempts based on ip and user
+  var resArr = [];
+  data.filter(function (item) {
+    var i = resArr.findIndex(
+      (x) => x.user == item.user && x.ip == item.ip
+    );
+    if (i <= -1) {
+      resArr.push(item);
+    }
+  });
+  return resArr;
+}
+
 app.get("/globe", async function (req, res) {
   lat_long = new Array();
   await getData(lat_long);
@@ -58,6 +73,7 @@ app.get("/globe", async function (req, res) {
 app.get("", async function (req, res) {
   lat_long = new Array();
   await getData(lat_long);
+  lat_long = filter_data(lat_long);
   res.render("index", { loc: lat_long });
 });
 
@@ -82,7 +98,7 @@ async function populateRedis(ip, user, port, server) {
       }
       redis.HMSET(ip, "lon", data.lon, "lat", data.lat);
     }
-    
+
     time = String(Math.floor(Date.now() / 1000));
     redis.HMSET(
       time,
