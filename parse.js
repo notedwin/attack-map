@@ -67,6 +67,7 @@ function filter_data(data) {
 app.get("/globe", async function (req, res) {
   lat_long = new Array();
   await getData(lat_long);
+  lat_long = filter_data(lat_long);
   res.render("globe", { loc: lat_long });
 });
 
