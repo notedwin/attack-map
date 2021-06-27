@@ -54,9 +54,7 @@ function filter_data(data) {
   // return unique attempts based on ip and user
   var resArr = [];
   data.filter(function (item) {
-    var i = resArr.findIndex(
-      (x) => x.user == item.user && x.ip == item.ip
-    );
+    var i = resArr.findIndex((x) => x.user == item.user && x.ip == item.ip);
     if (i <= -1) {
       resArr.push(item);
     }
@@ -83,7 +81,9 @@ async function populateRedis(ip, user, port, server) {
   // Memoization, prevent API call for the same IP
   try {
     var data = {};
-    exists = await redis.existsAsync(ip);
+    exists = await redis.existsAsync(ip).catch(function (err) {
+      console.log(" [ERROR] ", err);
+    });
     if (exists == 1) {
       data = await redis.hgetallAsync(ip);
     } else {
