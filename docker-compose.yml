@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  web:
+    restart: always
+    depends_on: 
+        - redis
+    build: .
+    ports:
+      - "3000:3000"
+  redis:
+    image: "redis:alpine"
+    environment: 
+

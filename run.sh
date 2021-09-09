@@ -1,0 +1,1 @@
+docker build . -t attack-map --secret id=env,src=.env
