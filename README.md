@@ -5,7 +5,7 @@ This application gets logs from the honey pot server using rsyslog.
 Once data from rsyslog is recieved the latitude and longitude are requested through an external API.
 We memoize these IP address using redis using redis HMSET.
 We also use redis to store the attempts using the unix epoch as the key.
-The server when prompted for map.edwin.computer, returns SSH attempts within 30 minutes using redis ZRANGESCORE .
+The server when prompted for map.notedwin.tech, returns SSH attempts within 30 minutes using redis ZRANGESCORE .
 
 # How to run
 Add this to your rsyslog.conf
