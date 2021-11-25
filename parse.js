@@ -5,6 +5,7 @@ var app = express();
 var path = require("path");
 const { filter } = require("bluebird");
 require("dotenv").config();
+var https = require('https');
 
 const redis = require("redis").createClient({
   host: process.env.REDIS_IP,
@@ -70,10 +71,18 @@ app.get("/globe", async function (req, res) {
 });
 
 app.get("", async function (req, res) {
-  lat_long = new Array();
-  await getData(lat_long);
-  lat_long = filter_data(lat_long);
-  res.render("index", { loc: lat_long });
+  try {
+    // make a request to the API
+    var { data, status, statusText } = await Axios.get(
+      "https://aws.notedwin.tech/data"
+    );
+    // parse data as json
+    lat_long = filter_data(data.list);
+    res.render("index", { loc: lat_long });
+
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 async function populateRedis(ip, user, port, server) {
