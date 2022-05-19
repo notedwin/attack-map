@@ -1,0 +1,29 @@
+[package]
+name = "rustypi"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1.18", features = ["full"] }
+rocket = { version = "0.5.0-rc.1", features = ["json", "secrets", "tls"] }
+rocket_dyn_templates = { version = "0.1.0-rc.1", features = ["tera"] }
+redis = "0.21.5"
+regex = "1.5.5"
+lazy_static = "1.4.0"
+serde_json = "1.0.81"
+chrono = "0.4.19"
+log = { version = "0.4.17", features = ["max_level_debug", "release_max_level_warn"] }
+serde = { version = "1.0.137", features = ["derive"] }
+ring = "0.16.19"
+
+[dependencies.reqwest]
+version = "0.11.10"
+default-features = false
+features = ["rustls-tls","json"]
+
+[dependencies.simple_logger]
+version = "2.1.0"
+default-features = false
+features = ["timestamps","colors"]
