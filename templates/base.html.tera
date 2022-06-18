@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber attack Map</title>
+    <style>
+        :root {
+            /*colors*/
+            /*--background: #ececee;
+            /*--text: #2c2c2c;
+            /*fonts*/
+
+            --background: #222;
+            --text: #ececee;
+            --accent: #ff6d6b;
+
+            --titleFont: "InterDisplay";
+            --serifFont: "Lato";
+            --fontSize: 2rem;
+        }
+
+        html {
+            font-family: var(--titleFont), -system-ui, system-ui, sans-serif;
+            font-size: 62.5%;
+            color: var(--text);
+            margin: 0 auto;
+            text-decoration: none;
+            max-width: 1000px;
+            background-color: var(--background);
+        }
+
+        body {
+            box-shadow: 0 0 0 5rem var(--background);
+        }
+
+        h1 {
+            font-family: var(--titleFont), "Raleway", "HelveticaNeue", "Helvetica Neue";
+            font-size: 2.75rem;
+            font-weight: bold;
+            margin: auto 0;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-evenly;
+            height: auto;
+            margin: auto;
+            border-bottom: 1px solid #3f3f3f;
+            align-items: center;
+            -webkit-transition: 0.3s ease-out;
+            transition: 0.3s ease-out;
+            max-width: 1000px;
+        }
+
+        nav>a {
+            color: var(--text);
+            text-decoration: none;
+            padding: 5px 4px;
+            opacity: 0.85;
+            text-align: center;
+            font-size: var(--fontSize);
+        }
+
+        a:hover {
+            opacity: 1;
+            background-color: var(--accent);
+        }
+
+        div.hoverinfo {
+            background-color: var(--background);
+            color: var(--text);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-top: 20px;
+            text-align: center;
+            font-size: var(--fontSize);
+        }
+
+        caption {
+            padding: 0.5em;
+            text-align: left;
+        }
+
+
+        th,
+        td {
+            width: 100%;
+            border: 1px solid;
+            padding: 0.5em;
+            text-align: left;
+            vertical-align: top;
+            font-weight: normal;
+        }
+
+        tbody {
+            display: block;
+            max-height: 25rem;
+            position: relative;
+            overflow-y: scroll;
+            -ms-overflow-style: -ms-autohiding-scrollbar;
+        }
+
+        tr {
+            display: flex;
+        }
+
+    </style>
+</head>
+
+<body>
+    {% block scripts %}{% endblock scripts %}
+    {% block content %} {% endblock %}
+</body>
+
+</html>

@@ -1,7 +1,2 @@
-venv/
-__pycache__/
-node_modules
-.env
-*/tls
-tls
-logs
+/target
+.DS_Store
