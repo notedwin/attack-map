@@ -11,7 +11,7 @@ use serde_json::{json, Value};
 const API: &str = "http://ip-api.com/json/";
 lazy_static! {
     pub static ref CE:Config = Config::new(env::args()).unwrap();
-    static ref RE: Regex = Regex::new(r"\w{0,9}\s+\d{1,2} (\d{2}:\d{2}:\d{2}) localhost sshd\[\d*]: Failed password for invalid user (\w{0,12}) from (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*").unwrap();
+    static ref RE: Regex = Regex::new(r"(\w{0,9}\s+\d{1,2} \d{2}:\d{2}:\d{2}) localhost sshd\[\d*]: Failed password for invalid user (\w{0,12}) from (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*").unwrap();
     static ref REDIS_CLIENT: Client = Client::open(CE.redis_url.to_string()).unwrap();
 }
 
@@ -78,12 +78,12 @@ pub fn pull_hackers() -> Result<Vec<Hacker>, Box<dyn std::error::Error>> {
     result
 }
 
-pub fn hacker_json() -> Result<Value, Box<dyn std::error::Error>> {
+pub fn hacker_json() -> Result<(Value, usize), Box<dyn std::error::Error>> {
     let hackers = pull_hackers()?;
     let hackers_json: String = serde_json::to_string(&hackers)?;
     let h_string = json!( hackers_json);
     println!("hackers: {}", h_string);
-    Ok(h_string)
+    Ok((h_string, hackers.len()))
 }
 
 async fn populate_redis(user: &str, ip: &str, time: i64) -> Result<(), Box<dyn std::error::Error>> {
@@ -154,10 +154,10 @@ pub async fn parse_log_line(line: &str) -> Result<(), Box<dyn std::error::Error>
     let mut log = RE.capture_locations();
     if RE.captures_read(&mut log, line).is_some(){
 
-        let (u_start,u_end) = log.get(3).expect("Failed to get user");
+        let (u_start,u_end) = log.get(2).expect("Failed to get user");
         let user = &line[u_start..u_end];
 
-        let (i_start,i_end) = log.get(5).expect("Failed to get ip");
+        let (i_start,i_end) = log.get(3).expect("Failed to get ip");
         let ip = &line[i_start..i_end];
 
         let (t_start,t_end) = log.get(1).expect("Failed to get time");

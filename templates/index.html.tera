@@ -4,6 +4,7 @@
 <nav>
     <h1>Attack Map</h1>
     <a href="https://notedwin.tech">Home page</a>
+    <a>num hackers in past hour: {{len}}</a>
 </nav>
 
 
