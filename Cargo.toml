@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.18", features = ["full"] }
-rocket = { version = "0.5.0-rc.1", features = ["json", "secrets", "tls"] }
-rocket_dyn_templates = { version = "0.1.0-rc.1", features = ["tera"] }
+rocket = { version = "0.5.0-rc.2", features = ["json", "secrets", "tls"] }
+rocket_dyn_templates = { version = "0.1.0-rc.2", features = ["tera"] }
 redis = "0.21.5"
 regex = "1.5.5"
 lazy_static = "1.4.0"

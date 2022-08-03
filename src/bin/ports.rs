@@ -2,8 +2,8 @@ use std::net::{SocketAddr, TcpStream};
 
 use rustypi::{pull_hackers, Hacker};
 
-fn main() {
-    let hackers: Vec<Hacker> = pull_hackers();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let hackers: Vec<Hacker> = pull_hackers()?;
     // array of unique IPs
     let mut unique_ips: Vec<String> = Vec::new();
     for hacker in hackers {
@@ -14,7 +14,7 @@ fn main() {
 
     for raw_ip in unique_ips {
 
-        let ip:SocketAddr = format!("{}:443", raw_ip.clone()).parse().expect("Could not parse ip");
+        let ip:SocketAddr = format!("{}:443", raw_ip.clone()).parse()?;
 
         // try to connect to the ip
         match TcpStream::connect_timeout(&ip, std::time::Duration::from_secs(1)) {
@@ -35,4 +35,5 @@ fn main() {
 
         // report
     }
+    Ok(())
 }

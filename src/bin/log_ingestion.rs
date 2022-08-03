@@ -6,28 +6,28 @@ use rustypi::{parse_log_line,CE};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    simple_logger::init_with_level(log::Level::Trace).unwrap();
+    simple_logger::init_with_level(log::Level::Trace)?;
     log::warn!("starting log ingestion... ");
     let path = &CE.path;
-    let mut len = fs::metadata(path).unwrap().len();
+    let mut len = fs::metadata(path)?.len();
     loop {
         std::thread::sleep(Duration::from_secs(10));
-        let nlen = fs::metadata(path).unwrap().len();
+        let new_len = fs::metadata(path)?.len();
 
-        if nlen != len {
+        if new_len == len {
+            log::warn!("Same Size File: {}", len);
+        } else {
             log::warn!("Different: {}", len);
-            let file = File::open(path).unwrap();
+            let file = File::open(path)?;
             let mut reader = BufReader::new(file);
-            reader.seek(SeekFrom::Start(len)).unwrap();
+            reader.seek(SeekFrom::Start(len))?;
             for line in reader.lines() {
-                let line = line.unwrap();
+                let line = line?;
                 if let Err(e) = parse_log_line(&line).await {
                     log::error!("{}", e);
                 }
             }
-            len = nlen;
-        } else {
-            log::warn!("Same Size File: {}", len);
+            len = new_len;
         }
     }
 }
