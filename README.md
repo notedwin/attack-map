@@ -1,5 +1,8 @@
 # Attack Map
 
+<img src="https://user-images.githubusercontent.com/47644298/186286621-90bbf3ea-0d07-44f6-b679-ed0ecc3b3a3a.png" width="400" height="400">
+
+
 A rust application using regex to continously parse the log file at /var/log/auth.log and store information about failed login attempts in a database.
 Most data is recieved from the log file, however using the IP address we cam get the (rough) location of a user.
 
