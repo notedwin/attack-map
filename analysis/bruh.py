@@ -1,3 +1,4 @@
+# script to run on host to analyze nginx logs
 import os
 import re
 import gzip

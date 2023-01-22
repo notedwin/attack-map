@@ -1,3 +1,7 @@
 /target
 .DS_Store
 run_ports.sh
+.vscode
+.ipynb_checkpoints
+rasp-ansible
+.env

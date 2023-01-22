@@ -163,8 +163,10 @@ pub async fn parse_log_line(line: &str) -> Result<(), Box<dyn std::error::Error>
         let (t_start,t_end) = log.get(1).expect("Failed to get time");
         let time = &line[t_start..t_end];
 
+        let year = Local::now().format("%Y").to_string();
+
         let timestamp = NaiveDateTime::parse_from_str(
-            format!("{}{}", time, " 2022").as_str(),
+            format!("{}{}", time, year).as_str(), // hard coded year, bruh moment
             "%b %e %T %Y",
         )?
         .timestamp();
