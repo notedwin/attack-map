@@ -12,6 +12,7 @@ readonly TARGET_ARCH=aarch64-unknown-linux-musl
 readonly LOG_PATH=./target/${TARGET_ARCH}/release/log_ingestion
 readonly WEB_PATH=./target/${TARGET_ARCH}/release/web-server
 readonly PORTS_PATH=./target/${TARGET_ARCH}/release/ports
+readonly PIPELINE=./analysis/pipeline.py
 
 export CC_aarch64_unknown_linux_musl=clang
 export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
@@ -25,3 +26,7 @@ rsync ${WEB_PATH} ${TARGET_HOST}:${TARGET_PATH}
 rsync ${PORTS_PATH} ${TARGET_HOST}:${TARGET_PATH}
 rsync -r ./static/ ${TARGET_HOST}:${TARGET_PATH}/static
 rsync -r ./templates/ ${TARGET_HOST}:${TARGET_PATH}/templates
+
+# pip3 install pandas sqlalchemy==1.4.4 python-dotenv requests psycopg2 
+rsync ${PIPELINE} ${TARGET_HOST}:${TARGET_PATH}
+rsync .env ${TARGET_HOST}:${TARGET_PATH}

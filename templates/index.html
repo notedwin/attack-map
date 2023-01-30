@@ -1,4 +1,4 @@
-{% extends "base" %}
+{% extends "base.html" %}
 
 {% block content %}
 <nav>
@@ -21,7 +21,10 @@
     var bubbles = [];
     //basic map config with custom fills, mercator projection
     async function demo() {
-        var loc = JSON.parse("{{name}}".replace(/&quot;/g, '"'));
+        var loc = JSON.parse("{{name}}".replace(/&#34;/ig, '"'));
+        // convert json to array
+        var loc = loc["hackers"]
+        console.log(loc);
         var _table_ = document.createElement('table'),
             _tr_ = document.createElement('tr'),
             _th_ = document.createElement('th'),
@@ -101,7 +104,11 @@
             arcs.pop();
 
             // get and remove random element from array
+            
+
             var random_ip = loc[Math.floor(Math.random() * loc.length)];
+            console.log(random_ip);
+
             loc.splice(loc.indexOf(random_ip), 1);
 
 

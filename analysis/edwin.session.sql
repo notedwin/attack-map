@@ -34,3 +34,15 @@ from accesslog
 GROUP BY 1
 HAVING COUNT(distinct log_line->>'ip') > 10
 
+
+WITH logs AS (
+SELECT * FROM processed_logs
+	WHERE created_at > '2023-01-01'
+)
+
+SELECT * FROM logs
+INNER JOIN ip_data ip
+ON logs.ip = ip.query
+LIMIT 100
+
+SELECT * FROM metadata

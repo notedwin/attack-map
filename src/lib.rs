@@ -12,7 +12,13 @@ const API: &str = "http://ip-api.com/json/";
 lazy_static! {
     pub static ref CE:Config = Config::new(env::args()).unwrap();
     static ref RE: Regex = Regex::new(r"(\w{0,9}\s+\d{1,2} \d{2}:\d{2}:\d{2}) localhost sshd\[\d*]: Failed password for invalid user (\w{0,12}) from (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*").unwrap();
+    // regex for successful login
+    static ref RE2: Regex = Regex::new(r"(\w{0,9}\s+\d{1,2} \d{2}:\d{2}:\d{2}) localhost sshd\[\d*]: Accepted password for (\w{0,12}) from (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*").unwrap();
     static ref REDIS_CLIENT: Client = Client::open(CE.redis_url.to_string()).unwrap();
+    
+
+    let path: &'static str = env!("PATH");
+println!("the $PATH variable at the time of compiling was: {path}");
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -85,6 +91,40 @@ pub fn hacker_json() -> Result<(Value, usize), Box<dyn std::error::Error>> {
     println!("hackers: {}", h_string);
     Ok((h_string, hackers.len()))
 }
+
+async fn populate_postgres(user: &str, ip: &str, time: i64) -> Result<(), Box<dyn std::error::Error>> {
+    warn!("Populate Postgres: {} : {}", user, ip);
+
+    let data: Location = get_ipdata(ip).await?;
+    let hacker = Hacker {
+        user: user.to_string(),
+        ip: ip.to_string(),
+        lon: data.lon,
+        lat: data.lat,
+        time: time.to_string(),
+    };
+
+    warn!("{:?}", hacker);
+    let hacker_json: String = serde_json::to_string(&hacker)?;
+    let res = reqwest::Client::new()
+        .post("http://localhost:8080/hackers")
+        .body(hacker_json)
+        .send()
+        .await?;
+
+    if res.status().is_success() {
+        warn!("Success");
+    } else {
+        warn!("Error: {}", res.status());
+    }
+
+    Ok(())
+}
+
+// either parse logs directly to postgres using rsyslog or send logs to rust log ingestor then parse to postgres
+// figure out if IP table in redis or in postgres is better
+// one has overhead on the time it takes to connected and get IP
+// the other has overhead as we wont have IP data until the log is processed, I think this makes more sense since we dont need to store IP data for every log immediately
 
 async fn populate_redis(user: &str, ip: &str, time: i64) -> Result<(), Box<dyn std::error::Error>> {
     warn!("Populate Redis: {} : {}", user, ip);
@@ -172,6 +212,7 @@ pub async fn parse_log_line(line: &str) -> Result<(), Box<dyn std::error::Error>
         .timestamp();
 
         populate_redis(user, ip, timestamp).await?;
+        populate_postgres(user, ip, timestamp).await?;
    }
    Ok(())
 }
