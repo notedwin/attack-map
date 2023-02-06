@@ -10,6 +10,7 @@ import os
 import requests
 import time
 import json
+import redis
 
 load_dotenv()
 
@@ -19,8 +20,8 @@ logging.basicConfig(
 
 logger = logging.getLogger("etl")
 
-# connect to database and create engine
-
+redis_url = os.getenv(key="REDIS_URL")
+r = redis.from_url(redis_url)
 
 
 
@@ -31,7 +32,7 @@ FINAL_TABLE = "processed_logs"
 API = "http://ip-api.com/batch/"
 
 
-def normalize_raw(engine, table_name):
+def normalize_raw(table_name):
     # get data from previous runs via metadata table
     latest_row = 0
     if inspector.has_table("metadata"):
@@ -68,7 +69,7 @@ def normalize_raw(engine, table_name):
         f"Last row processed was: {max_value}, Inserted {num_rows} rows into metadata table"
     )
 
-def create_lat_long_table(engine):
+def create_lat_long_table():
     df = pd.read_sql_query(
         """SELECT DISTINCT ip
         FROM processed_logs
@@ -112,9 +113,36 @@ def create_lat_long_table(engine):
         f"{num_rows} IP's were added to ip table."
     )
 
+def move_data_from_redis_to_postgres():
+    latest_row = 0
+    # drop ssh_failed table if it exists
+    if inspector.has_table("ssh_failed"):
+        engine.execute("DROP TABLE ssh_failed")
+    # if inspector.has_table("ssh_failed"):
+    #     df = pd.read_sql_query("select COUNT(*) as c FROM ssh_failed", con=engine)
+    #     latest_row = df["c"][0] + 1
+    total_hackers = r.zcard("hackers")
+    logger.info(f"Latest row processed was: {latest_row}, Total hackers: {total_hackers}")
+    for i in range(latest_row, total_hackers, 10000):
+        logger.info(f"Processing hackers {i} to {i + 10000}")
+        hackers = [json.loads(r.get(hacker)) for hacker in r.zrange("hackers", i, i + 10000)]
+        for hacker in hackers:
+            hacker["time"] = pd.to_datetime(hacker["time"], unit="s")
+        hackers = pd.DataFrame(hackers)
+        logger.info(f"Read {hackers.shape[0]} rows from hackers table")
+        num_rows = hackers.to_sql(
+            "ssh_failed",
+            engine,
+            if_exists="append",
+            index=False,
+            chunksize=10000,
+            method="multi",
+        )
+        logger.info(f"Inserted {num_rows} rows into hackers table")
 
 if __name__ == "__main__":
     logger.info("Starting ETL")
-    normalize_raw(engine, FINAL_TABLE)
-    create_lat_long_table(engine)
+    normalize_raw(FINAL_TABLE)
+    move_data_from_redis_to_postgres()
+    create_lat_long_table()
     logger.info("ETL complete")

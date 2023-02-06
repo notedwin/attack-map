@@ -5,3 +5,4 @@ run_ports.sh
 .ipynb_checkpoints
 rasp-ansible
 .env
+*.c

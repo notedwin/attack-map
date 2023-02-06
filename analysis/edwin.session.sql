@@ -46,3 +46,30 @@ ON logs.ip = ip.query
 LIMIT 100
 
 SELECT * FROM metadata
+
+WITH ssh AS (SELECT IP, COUNT(*) FROM ssh_failed GROUP BY IP), logs AS (SELECT IP, COUNT(*) FROM processed_logs GROUP BY IP)
+
+SELECT * FROM logs
+INNER JOIN ssh
+ON logs.ip = ssh.ip
+
+SELECT * FROM ssh_failed
+
+
+-- average number of requests per week
+
+
+SELECT COUNT(*) / (SELECT COUNT(DISTINCT extract(week from created_at)) FROM processed_logs) FROM processed_logs
+
+SELECT COUNT(*) / (SELECT COUNT(DISTINCT extract(month from created_at)) FROM processed_logs) FROM processed_logs
+
+
+SELECT COUNT(*) / (SELECT COUNT(DISTINCT created_at::date) FROM processed_logs) FROM processed_logs
+
+select COUNT(*) as c FROM ssh_failed
+
+
+WITH agg AS (SELECT 1, [1,2,3])
+
+SELECT * FROM agg
+CROSS JOIN unnest(agg) WITH ORDINALITY AS t (value, ord)
